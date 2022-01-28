@@ -359,28 +359,40 @@ suite("Functional Tests", function () {
   });
 
   test("Update an issue with no fields to update: PUT request to `/api/issues/{project}`", async () => {
-    test("Update an issue with missing _id: PUT request to `/api/issues/{project}`", async () => {
-      // Attempt to update Issue
-      const updateRes = await chai
-        .request(server)
-        .put(`/api/issues/foo`)
-        .type("form")
-        .send({
-          _id: "foo",
-        });
-      assert.equal(updateRes.status, 400, "updateRes status");
-      assert.deepEqual(updateRes.body, {
-        error: "no update field(s) sent",
+    // Attempt to update Issue
+    const updateRes = await chai
+      .request(server)
+      .put(`/api/issues/foo`)
+      .type("form")
+      .send({
         _id: "foo",
       });
+    assert.equal(updateRes.status, 400, "updateRes status");
+    assert.deepEqual(updateRes.body, {
+      error: "no update field(s) sent",
+      _id: "foo",
     });
 
     await Promise.resolve();
   });
 
-  // test("Update an issue with an invalid _id: PUT request to `/api/issues/{project}`", (done) => {
-  //   assert.fail();
-  // });
+  test("Update an issue with an invalid _id: PUT request to `/api/issues/{project}`", async () => {
+    // Attempt to update Issue
+    const updateRes = await chai
+      .request(server)
+      .put(`/api/issues/foo`)
+      .type("form")
+      .send({
+        _id: "61f404887abd7a4988dae901",
+        issue_title: "bar",
+      });
+    assert.equal(updateRes.status, 200, "updateRes status");
+    assert.deepEqual(updateRes.body, {
+      error: "invalid _id",
+    });
+
+    await Promise.resolve();
+  });
 
   // test("Delete an issue: DELETE request to `/api/issues/{project}`", (done) => {
   //   assert.fail();

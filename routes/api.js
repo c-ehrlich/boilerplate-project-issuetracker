@@ -67,7 +67,6 @@ module.exports = function (app) {
 
       // make sure we're actually updating something
       if (JSON.stringify(Object.keys(req.body)) === JSON.stringify(["_id"])) {
-        console.log("check works");
         res.status(400);
         return res.json({
           error: "no update field(s) sent",
@@ -92,10 +91,19 @@ module.exports = function (app) {
       };
 
       Issue.findByIdAndUpdate(req.body._id, updatePayload, (err, obj) => {
+        if (!obj) {
+          // this check needs to go before the `if (err)` check
+          // because not getting an obj can happen both with and without err
+          return res.json({
+            error: "invalid _id",
+          });
+        }
+
         if (err) {
           console.error(err);
           return res.json({ error: "failed to find or update issue." });
         }
+
         return res.json({
           result: "successfully updated",
           _id: obj._id,

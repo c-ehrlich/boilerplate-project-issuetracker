@@ -59,9 +59,20 @@ module.exports = function (app) {
     })
 
     .put((req, res) => {
+      // make sure an object ID is given
       if (!req.body._id) {
         res.status(400);
         return res.json({ error: "missing _id" });
+      }
+
+      // make sure we're actually updating something
+      if (JSON.stringify(Object.keys(req.body)) === JSON.stringify(["_id"])) {
+        console.log("check works");
+        res.status(400);
+        return res.json({
+          error: "no update field(s) sent",
+          _id: req.body._id,
+        });
       }
 
       const project = req.params.project;

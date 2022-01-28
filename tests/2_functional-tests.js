@@ -292,11 +292,29 @@ suite("Functional Tests", function () {
     assert.deepEqual(updateRes.body, {
       error: "missing _id",
     });
+
+    await Promise.resolve();
   });
 
-  // test("Update an issue with no fields to update: PUT request to `/api/issues/{project}`", (done) => {
-  //   assert.fail();
-  // });
+  test("Update an issue with no fields to update: PUT request to `/api/issues/{project}`", async () => {
+    test("Update an issue with missing _id: PUT request to `/api/issues/{project}`", async () => {
+      // Attempt to update Issue
+      const updateRes = await chai
+        .request(server)
+        .put(`/api/issues/foo`)
+        .type("form")
+        .send({
+          _id: "foo",
+        });
+      assert.equal(updateRes.status, 400, "updateRes status");
+      assert.deepEqual(updateRes.body, {
+        error: "no update field(s) sent",
+        _id: "foo",
+      });
+    });
+
+    await Promise.resolve();
+  });
 
   // test("Update an issue with an invalid _id: PUT request to `/api/issues/{project}`", (done) => {
   //   assert.fail();

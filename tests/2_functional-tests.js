@@ -23,7 +23,6 @@ suite("Functional Tests", function () {
       })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        // search for an issue on project <now>, check it for 200 and deepequal
         Issue.findOne({ project: `fcc-${now}` }, (err, obj) => {
           if (err) console.error(err);
           assert.equal(obj.issue_title, "test-issue-title");
@@ -36,6 +35,7 @@ suite("Functional Tests", function () {
         });
       });
   });
+
   test("Create an issue with only required fields: POST request to `/api/issues/{project}`", (done) => {
     const now = new Date().getTime();
     chai
@@ -49,7 +49,6 @@ suite("Functional Tests", function () {
       })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        // search for an issue on project <now>, check it for 200 and deepequal
         Issue.findOne({ project: `fcc-${now}` }, (err, obj) => {
           if (err) console.error(err);
           assert.equal(obj.issue_title, "test-issue-title");
@@ -62,9 +61,24 @@ suite("Functional Tests", function () {
         });
       });
   });
-  // test("Create an issue with missing required fields: POST request to `/api/issues/{project}`", (done) => {
-  //   assert.fail();
-  // });
+
+  test("Create an issue with missing required fields: POST request to `/api/issues/{project}`", (done) => {
+    const now = new Date().getTime();
+    chai
+      .request(server)
+      .post(`/api/issues/fcc-${now}`)
+      .type("form")
+      .send({
+        assigned_to: "test",
+        status_text: "test",
+      })
+      .end((err, res) => {
+        if (err) console.log(error);
+        assert.equal(res.status, 400);
+        assert.equal(res.body.error, "required field(s) missing");
+        done();
+      });
+  });
   // test("View issues on a project: GET request to `/api/issues/{project}`", (done) => {
   //   assert.fail();
   // });

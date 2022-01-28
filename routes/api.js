@@ -26,7 +26,7 @@ module.exports = function (app) {
       if (
         !(req.body.issue_title && req.body.issue_text && req.body.created_by)
       ) {
-        console.log("required field(s) missing");
+        res.status(400);
         return res.json({ error: "required field(s) missing" });
       }
 

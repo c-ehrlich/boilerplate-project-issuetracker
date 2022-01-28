@@ -10,6 +10,8 @@ chai.use(chaiHttp);
 suite("Functional Tests", function () {
   test("Create an issue with every field: POST request to `/api/issues/{project}`", (done) => {
     const now = new Date().getTime();
+
+    // Create issue
     chai
       .request(server)
       .post(`/api/issues/fcc-${now}`)
@@ -39,6 +41,8 @@ suite("Functional Tests", function () {
 
   test("Create an issue with only required fields: POST request to `/api/issues/{project}`", (done) => {
     const now = new Date().getTime();
+
+    // Create issue
     chai
       .request(server)
       .post(`/api/issues/fcc-${now}`)
@@ -66,6 +70,8 @@ suite("Functional Tests", function () {
 
   test("Create an issue with missing required fields: POST request to `/api/issues/{project}`", (done) => {
     const now = new Date().getTime();
+
+    // Create issue
     chai
       .request(server)
       .post(`/api/issues/fcc-${now}`)
@@ -82,9 +88,11 @@ suite("Functional Tests", function () {
       });
   });
 
-  test("View issues on a project: GET request to `/api/issues/{project}`", (done) => {
+  test("View issues on a project: GET request to `/api/issues/{project}`", async () => {
     const now = new Date().getTime();
-    chai
+
+    // Create Issue
+    const createRes = await chai
       .request(server)
       .post(`/api/issues/fcc-${now}`)
       .type("form")
@@ -92,29 +100,27 @@ suite("Functional Tests", function () {
         issue_title: "test-issue-title",
         issue_text: "test-issue-text",
         created_by: "test-created-by",
-      })
-      .end((err, createRes) => {
-        assert.equal(createRes.status, 200);
-
-        chai
-          .request(server)
-          .get(`/api/issues/fcc-${now}`)
-          .end((err, readRes) => {
-            assert.equal(readRes.status, 200);
-            assert.equal(readRes.body.length, 1);
-            assert.equal(readRes.body[0].issue_title, "test-issue-title");
-            assert.equal(readRes.body[0].issue_text, "test-issue-text");
-            assert.equal(readRes.body[0].created_by, "test-created-by");
-            done();
-          });
       });
+    assert.equal(createRes.status, 200);
+
+    // View issues
+    const readRes = await chai.request(server).get(`/api/issues/fcc-${now}`);
+    assert.equal(readRes.status, 200);
+    assert.equal(readRes.body.length, 1);
+    assert.equal(readRes.body[0].issue_title, "test-issue-title");
+    assert.equal(readRes.body[0].issue_text, "test-issue-text");
+    assert.equal(readRes.body[0].created_by, "test-created-by");
+
+    await Promise.resolve();
   });
 
-  test("View issues on a project with one filter: GET request to `/api/issues/{project}`", (done) => {
+  test("View issues on a project with one filter: GET request to `/api/issues/{project}`", async () => {
     const now = new Date().getTime();
     const created_by_filter = "test-created-by";
     const not_created_by_filter = "foo";
-    chai
+
+    // Create an Issue
+    const createRes = await chai
       .request(server)
       .post(`/api/issues/fcc-${now}`)
       .type("form")
@@ -122,35 +128,100 @@ suite("Functional Tests", function () {
         issue_title: "test-issue-title",
         issue_text: "test-issue-text",
         created_by: created_by_filter,
-      })
-      .end((err, createRes) => {
-        assert.equal(createRes.status, 200);
-
-        chai
-          .request(server)
-          .get(`/api/issues/fcc-${now}?created_by=${created_by_filter}`)
-          .end((err, readRes) => {
-            assert.equal(readRes.status, 200);
-            assert.equal(readRes.body.length, 1, "Checking that filtering for the right thing returns it");
-            assert.equal(readRes.body[0].issue_title, "test-issue-title");
-            assert.equal(readRes.body[0].issue_text, "test-issue-text");
-            assert.equal(readRes.body[0].created_by, "test-created-by");
-
-            chai
-              .request(server)
-              .get(`/api/issues/fcc-${now}?created_by=${not_created_by_filter}`)
-              .end((err, readRes) => {
-                assert.equal(readRes.status, 200);
-                assert.equal(readRes.body.length, 0, "Checking that filtering for the wrong thing doesn't return anything");
-                done();
-              });
-          });
       });
+    assert.equal(createRes.status, 200);
+
+    // Search with correct filter
+    const readRes = await chai
+      .request(server)
+      .get(`/api/issues/fcc-${now}?created_by=${created_by_filter}`);
+    assert.equal(readRes.status, 200);
+    assert.equal(
+      readRes.body.length,
+      1,
+      "Checking that filtering for the right thing returns it"
+    );
+    assert.equal(readRes.body[0].issue_title, "test-issue-title");
+    assert.equal(readRes.body[0].issue_text, "test-issue-text");
+    assert.equal(readRes.body[0].created_by, "test-created-by");
+
+    // Search with incorrect filter
+    const readRes2 = await chai
+      .request(server)
+      .get(`/api/issues/fcc-${now}?created_by=${not_created_by_filter}`);
+    assert.equal(readRes.status, 200);
+    assert.equal(
+      readRes2.body.length,
+      0,
+      "Checking that filtering for the wrong thing doesn't return anything"
+    );
+
+    await Promise.resolve();
   });
 
-  // test("View issues on a project with multiple filters: GET request to `/api/issues/{project}`", (done) => {
-  //   assert.fail();
-  // });
+  test("View issues on a project with multiple filters: GET request to `/api/issues/{project}`", async () => {
+    const now = new Date().getTime();
+    const created_by_filter = "test-created-by";
+    const not_created_by_filter = "foo";
+    const open_filter = true;
+    const not_open_filter = false;
+
+    // create an Issue object
+    const createRes = await chai
+      .request(server)
+      .post(`/api/issues/fcc-${now}`)
+      .type("form")
+      .send({
+        issue_title: "test-issue-title",
+        issue_text: "test-issue-text",
+        created_by: created_by_filter,
+      });
+    assert.equal(createRes.status, 200, "createRes status");
+
+    // filter by the correct `created_by` and `open`
+    const readRes1 = await chai
+      .request(server)
+      .get(
+        `/api/issues/fcc-${now}?created_by=${created_by_filter}&open=${open_filter}`
+      );
+    assert.equal(readRes1.status, 200, "readRes1 status");
+    assert.equal(
+      readRes1.body.length,
+      1,
+      "Checking that filtering for the right thing returns it"
+    );
+    assert.equal(readRes1.body[0].issue_title, "test-issue-title");
+    assert.equal(readRes1.body[0].issue_text, "test-issue-text");
+    assert.equal(readRes1.body[0].created_by, "test-created-by");
+
+    // filter by incorrect `created_by`
+    const readRes2 = await chai
+      .request(server)
+      .get(
+        `/api/issues/fcc-${now}?created_by=${not_created_by_filter}&open=${open_filter}`
+      );
+    assert.equal(readRes2.status, 200, "readRes2 status");
+    assert.equal(
+      readRes2.body.length,
+      0,
+      "Checking that filtering for the wrong `created_by` doesn't return anything"
+    );
+
+    // filter by incorrect `open`
+    const readRes3 = await chai
+      .request(server)
+      .get(
+        `/api/issues/fcc-${now}?created_by=${created_by_filter}&open=${not_open_filter}`
+      );
+    assert.equal(readRes3.status, 200, "readRes3 status");
+    assert.equal(
+      readRes3.body.length,
+      0,
+      "Checking that filtering for the wrong `open` doesn't return anything"
+    );
+
+    await Promise.resolve();
+  });
 
   // test("Update one field on an issue: PUT request to `/api/issues/{project}`", (done) => {
   //   assert.fail();

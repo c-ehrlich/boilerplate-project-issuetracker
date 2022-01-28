@@ -59,6 +59,11 @@ module.exports = function (app) {
     })
 
     .put((req, res) => {
+      if (!req.body._id) {
+        res.status(400);
+        return res.json({ error: "missing _id" });
+      }
+
       const project = req.params.project;
       const updatePayload = {
         ...(req.body.issue_title !== "" && {

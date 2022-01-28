@@ -279,9 +279,20 @@ suite("Functional Tests", function () {
   //   assert.fail();
   // });
 
-  // test("Update an issue with missing _id: PUT request to `/api/issues/{project}`", (done) => {
-  //   assert.fail();
-  // });
+  test("Update an issue with missing _id: PUT request to `/api/issues/{project}`", async () => {
+    // Attempt to update Issue
+    const updateRes = await chai
+      .request(server)
+      .put(`/api/issues/foo`)
+      .type("form")
+      .send({
+        issue_title: "updated-title",
+      });
+    assert.equal(updateRes.status, 400, "updateRes status");
+    assert.deepEqual(updateRes.body, {
+      error: "missing _id",
+    });
+  });
 
   // test("Update an issue with no fields to update: PUT request to `/api/issues/{project}`", (done) => {
   //   assert.fail();

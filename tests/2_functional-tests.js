@@ -81,7 +81,7 @@ suite("Functional Tests", function () {
         status_text: "test",
       })
       .end((err, res) => {
-        if (err) console.log(error);
+        if (err) console.error(error);
         assert.equal(res.status, 400);
         assert.equal(res.body.error, "required field(s) missing");
         done();
@@ -223,9 +223,57 @@ suite("Functional Tests", function () {
     await Promise.resolve();
   });
 
-  // test("Update one field on an issue: PUT request to `/api/issues/{project}`", (done) => {
-  //   assert.fail();
-  // });
+  test("Update one field on an issue: PUT request to `/api/issues/{project}`", async () => {
+    const now = new Date().getTime();
+
+    // Create Issue
+    const createRes = await chai
+      .request(server)
+      .post(`/api/issues/fcc-${now}`)
+      .type("form")
+      .send({
+        issue_title: "test-issue-title",
+        issue_text: "test-issue-text",
+        created_by: "test-created-by",
+        assigned_to: "test-assigned-to",
+        status_text: "test-status-text",
+      });
+    assert.equal(createRes.status, 200, "createRes status");
+    assert.include(createRes.body, {
+      issue_title: "test-issue-title",
+      issue_text: "test-issue-text",
+      created_by: "test-created-by",
+      assigned_to: "test-assigned-to",
+      status_text: "test-status-text",
+      open: true,
+    });
+
+    // Update Issue
+    const _id = createRes.body._id;
+
+    const updateRes = await chai
+      .request(server)
+      .put(`/api/issues/fcc-${now}`)
+      .type("form")
+      .send({
+        _id: _id,
+        issue_title: "updated-title",
+      });
+    assert.equal(updateRes.status, 200, "updateRes status");
+    assert.deepEqual(updateRes.body, {
+      result: "successfully updated",
+      _id: _id,
+    });
+
+    // Retrieve Issue, check modified object
+    const retrieveRes = await chai
+      .request(server)
+      .get(`/api/issues/fcc-${now}?_id=${_id}`);
+    assert.equal(retrieveRes.status, 200, "retrieveRes status");
+    assert.equal(retrieveRes.body[0].issue_title, "updated-title");
+
+    await Promise.resolve();
+  });
 
   // test("Update multiple fields on an issue: PUT request to `/api/issues/{project}`", (done) => {
   //   assert.fail();

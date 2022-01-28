@@ -3,6 +3,7 @@
  */
 const prepareIssueForJson = (issue) => {
   const prunedObject = (({
+    _id,
     assigned_to,
     status_text,
     open,
@@ -12,6 +13,7 @@ const prepareIssueForJson = (issue) => {
     created_on,
     updated_on,
   }) => ({
+    _id,
     assigned_to,
     status_text,
     open,

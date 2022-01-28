@@ -83,7 +83,7 @@ module.exports = function (app) {
         ...(req.body.issue_text !== "" && { issue_text: req.body.issue_text }),
         ...(req.body.created_by !== "" && { created_by: req.body.created_by }),
         ...(req.body.assigned_to !== "" && {
-          assigned_to: req.body.assigneD_to,
+          assigned_to: req.body.assigned_to,
         }),
         ...(req.body.status_text !== "" && {
           status_text: req.body.status_text,

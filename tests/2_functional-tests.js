@@ -275,9 +275,71 @@ suite("Functional Tests", function () {
     await Promise.resolve();
   });
 
-  // test("Update multiple fields on an issue: PUT request to `/api/issues/{project}`", (done) => {
-  //   assert.fail();
-  // });
+  test("Update multiple fields on an issue: PUT request to `/api/issues/{project}`", async () => {
+    const now = new Date().getTime();
+
+    // Create Issue
+    const createRes = await chai
+      .request(server)
+      .post(`/api/issues/fcc-${now}`)
+      .type("form")
+      .send({
+        issue_title: "test-issue-title",
+        issue_text: "test-issue-text",
+        created_by: "test-created-by",
+        assigned_to: "test-assigned-to",
+        status_text: "test-status-text",
+      });
+    assert.equal(createRes.status, 200, "createRes status");
+    assert.include(createRes.body, {
+      issue_title: "test-issue-title",
+      issue_text: "test-issue-text",
+      created_by: "test-created-by",
+      assigned_to: "test-assigned-to",
+      status_text: "test-status-text",
+      open: true,
+    });
+
+    // Update Issue
+    const _id = createRes.body._id;
+
+    const updateRes = await chai
+      .request(server)
+      .put(`/api/issues/fcc-${now}`)
+      .type("form")
+      .send({
+        _id: _id,
+        issue_title: "updated-issue-title",
+        issue_text: "updated-issue-text",
+        created_by: "updated-created-by",
+        assigned_to: "updated-assigned-to",
+        status_text: "updated-status-text",
+        open: false,
+      });
+    assert.equal(updateRes.status, 200, "updateRes status");
+    assert.deepEqual(updateRes.body, {
+      result: "successfully updated",
+      _id: _id,
+    });
+
+    // Retrieve Issue, check modified object
+    const retrieveRes = await chai
+      .request(server)
+      .get(`/api/issues/fcc-${now}?_id=${_id}`);
+    assert.equal(retrieveRes.status, 200, "retrieveRes status");
+    // assert.equal(retrieveRes.body[0].issue_title, "updated-issue-title");
+    assert.ownInclude(retrieveRes.body[0], {
+      _id: _id,
+      issue_title: "updated-issue-title",
+      issue_text: "updated-issue-text",
+      created_by: "updated-created-by",
+      assigned_to: "updated-assigned-to",
+      status_text: "updated-status-text",
+      open: false,
+    });
+
+    await Promise.resolve();
+  });
 
   test("Update an issue with missing _id: PUT request to `/api/issues/{project}`", async () => {
     // Attempt to update Issue

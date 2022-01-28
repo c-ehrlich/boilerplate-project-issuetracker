@@ -23,16 +23,17 @@ suite("Functional Tests", function () {
       })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        Issue.findOne({ project: `fcc-${now}` }, (err, obj) => {
-          if (err) console.error(err);
-          assert.equal(obj.issue_title, "test-issue-title");
-          assert.equal(obj.issue_text, "test-issue-text");
-          assert.equal(obj.created_by, "test-created-by");
-          assert.equal(obj.assigned_to, "test-assigned-to");
-          assert.equal(obj.status_text, "test-status-text");
-          assert.equal(obj.project, `fcc-${now}`);
-          done();
+        assert.include(res.body, {
+          issue_title: "test-issue-title",
+          issue_text: "test-issue-text",
+          created_by: "test-created-by",
+          assigned_to: "test-assigned-to",
+          status_text: "test-status-text", 
+          open: true,
         });
+        assert.exists(res.body.created_on);
+        assert.exists(res.body.updated_on);
+        done();
       });
   });
 
@@ -49,16 +50,17 @@ suite("Functional Tests", function () {
       })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        Issue.findOne({ project: `fcc-${now}` }, (err, obj) => {
-          if (err) console.error(err);
-          assert.equal(obj.issue_title, "test-issue-title");
-          assert.equal(obj.issue_text, "test-issue-text");
-          assert.equal(obj.created_by, "test-created-by");
-          assert.equal(obj.assigned_to, "");
-          assert.equal(obj.status_text, "");
-          assert.equal(obj.project, `fcc-${now}`);
-          done();
+        assert.include(res.body, {
+          issue_title: "test-issue-title",
+          issue_text: "test-issue-text",
+          created_by: "test-created-by",
+          assigned_to: "",
+          status_text: "", 
+          open: true,
         });
+        assert.exists(res.body.created_on);
+        assert.exists(res.body.updated_on);
+        done();
       });
   });
 
@@ -79,36 +81,47 @@ suite("Functional Tests", function () {
         done();
       });
   });
+
   // test("View issues on a project: GET request to `/api/issues/{project}`", (done) => {
   //   assert.fail();
   // });
+
   // test("View issues on a project with one filter: GET request to `/api/issues/{project}`", (done) => {
   //   assert.fail();
   // });
+
   // test("View issues on a project with multiple filters: GET request to `/api/issues/{project}`", (done) => {
   //   assert.fail();
   // });
+
   // test("Update one field on an issue: PUT request to `/api/issues/{project}`", (done) => {
   //   assert.fail();
   // });
+
   // test("Update multiple fields on an issue: PUT request to `/api/issues/{project}`", (done) => {
   //   assert.fail();
   // });
+
   // test("Update an issue with missing _id: PUT request to `/api/issues/{project}`", (done) => {
   //   assert.fail();
   // });
+
   // test("Update an issue with no fields to update: PUT request to `/api/issues/{project}`", (done) => {
   //   assert.fail();
   // });
+
   // test("Update an issue with an invalid _id: PUT request to `/api/issues/{project}`", (done) => {
   //   assert.fail();
   // });
+
   // test("Delete an issue: DELETE request to `/api/issues/{project}`", (done) => {
   //   assert.fail();
   // });
+
   // test("Delete an issue with an invalid _id: DELETE request to `/api/issues/{project}`", (done) => {
   //   assert.fail();
   // });
+
   // test("Delete an issue with missing _id: DELETE request to `/api/issues/{project}`", (done) => {
   //   assert.fail();
   // });

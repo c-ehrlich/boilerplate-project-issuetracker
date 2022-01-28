@@ -28,7 +28,7 @@ suite("Functional Tests", function () {
           issue_text: "test-issue-text",
           created_by: "test-created-by",
           assigned_to: "test-assigned-to",
-          status_text: "test-status-text", 
+          status_text: "test-status-text",
           open: true,
         });
         assert.exists(res.body.created_on);
@@ -55,7 +55,7 @@ suite("Functional Tests", function () {
           issue_text: "test-issue-text",
           created_by: "test-created-by",
           assigned_to: "",
-          status_text: "", 
+          status_text: "",
           open: true,
         });
         assert.exists(res.body.created_on);
@@ -82,13 +82,71 @@ suite("Functional Tests", function () {
       });
   });
 
-  // test("View issues on a project: GET request to `/api/issues/{project}`", (done) => {
-  //   assert.fail();
-  // });
+  test("View issues on a project: GET request to `/api/issues/{project}`", (done) => {
+    const now = new Date().getTime();
+    chai
+      .request(server)
+      .post(`/api/issues/fcc-${now}`)
+      .type("form")
+      .send({
+        issue_title: "test-issue-title",
+        issue_text: "test-issue-text",
+        created_by: "test-created-by",
+      })
+      .end((err, createRes) => {
+        assert.equal(createRes.status, 200);
 
-  // test("View issues on a project with one filter: GET request to `/api/issues/{project}`", (done) => {
-  //   assert.fail();
-  // });
+        chai
+          .request(server)
+          .get(`/api/issues/fcc-${now}`)
+          .end((err, readRes) => {
+            assert.equal(readRes.status, 200);
+            assert.equal(readRes.body.length, 1);
+            assert.equal(readRes.body[0].issue_title, "test-issue-title");
+            assert.equal(readRes.body[0].issue_text, "test-issue-text");
+            assert.equal(readRes.body[0].created_by, "test-created-by");
+            done();
+          });
+      });
+  });
+
+  test("View issues on a project with one filter: GET request to `/api/issues/{project}`", (done) => {
+    const now = new Date().getTime();
+    const created_by_filter = "test-created-by";
+    const not_created_by_filter = "foo";
+    chai
+      .request(server)
+      .post(`/api/issues/fcc-${now}`)
+      .type("form")
+      .send({
+        issue_title: "test-issue-title",
+        issue_text: "test-issue-text",
+        created_by: created_by_filter,
+      })
+      .end((err, createRes) => {
+        assert.equal(createRes.status, 200);
+
+        chai
+          .request(server)
+          .get(`/api/issues/fcc-${now}?created_by=${created_by_filter}`)
+          .end((err, readRes) => {
+            assert.equal(readRes.status, 200);
+            assert.equal(readRes.body.length, 1, "Checking that filtering for the right thing returns it");
+            assert.equal(readRes.body[0].issue_title, "test-issue-title");
+            assert.equal(readRes.body[0].issue_text, "test-issue-text");
+            assert.equal(readRes.body[0].created_by, "test-created-by");
+
+            chai
+              .request(server)
+              .get(`/api/issues/fcc-${now}?created_by=${not_created_by_filter}`)
+              .end((err, readRes) => {
+                assert.equal(readRes.status, 200);
+                assert.equal(readRes.body.length, 0, "Checking that filtering for the wrong thing doesn't return anything");
+                done();
+              });
+          });
+      });
+  });
 
   // test("View issues on a project with multiple filters: GET request to `/api/issues/{project}`", (done) => {
   //   assert.fail();

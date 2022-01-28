@@ -11,7 +11,15 @@ module.exports = function (app) {
 
     .get((req, res) => {
       const project = req.params.project;
-      let promise = Issue.find({ project: project }).exec();
+      let promise = Issue.find({
+        project: project,
+        ...(req.query.assigned_to && { assigned_to: req.query.assigned_to }),
+        ...(req.query.created_by && { created_by: req.query.created_by }),
+        ...(req.query.issue_text && { issue_text: req.query.issue_text }),
+        ...(req.query.issue_title && { issue_title: req.query.issue_title }),
+        ...(req.query.open && { open: req.query.open }),
+        ...(req.query.status_text && { status_text: req.query.status_text }),
+      }).exec();
       assert.ok(promise instanceof Promise);
       promise.then((issues) => {
         res.json(issues);
@@ -31,14 +39,14 @@ module.exports = function (app) {
       }
 
       const issue = new Issue({
-        project: project,
         assigned_to: req.body.assigned_to ?? "",
-        status_text: req.body.status_text ?? "",
-        open: req.body.open ?? true,
-        issue_title: req.body.issue_title,
-        issue_text: req.body.issue_text,
         created_by: req.body.created_by,
         created_on: date,
+        issue_text: req.body.issue_text,
+        issue_title: req.body.issue_title,
+        open: req.body.open ?? true,
+        project: project,
+        status_text: req.body.status_text ?? "",
         updated_on: date,
       });
 

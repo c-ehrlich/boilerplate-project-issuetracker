@@ -16,31 +16,6 @@ app.use("/public", express.static(process.cwd() + "/public"));
 
 app.use(cors({ origin: "*" })); //For FCC testing purposes only
 
-/**
- * DB SETUP
- */
-const myDB = require("./connection");
-
-const mongoose = require("mongoose");
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-const { Schema } = mongoose;
-const issueSchema = new Schema({
-  // CHECK WHICH ONES ARE REQUIRED
-  project: { type: String, required: true },
-  assigned_to: { type: String, required: false },
-  status_text: { type: String, required: false },
-  open: { type: Boolean, default: true },
-  issue_title: { type: String, required: true },
-  issue_text: { type: String, required: true },
-  created_by: { type: String, required: true },
-  created_on: { type: Date, default: Date.now },
-  updated_on: { type: Date, default: Date.now },
-});
-const Issue = mongoose.model("Issue", issueSchema);
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

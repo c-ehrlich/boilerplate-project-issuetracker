@@ -265,6 +265,11 @@ suite("Functional Tests", function () {
       .get(`/api/issues/fcc-${now}?_id=${_id}`);
     assert.equal(retrieveRes.status, 200, "retrieveRes status");
     assert.equal(retrieveRes.body[0].issue_title, "updated-title");
+    assert.notEqual(
+      retrieveRes.body[0].created_on,
+      retrieveRes.body[0].updated_on,
+      "updated_on has been changed"
+    );
 
     await Promise.resolve();
   });
@@ -331,6 +336,11 @@ suite("Functional Tests", function () {
       status_text: "updated-status-text",
       open: false,
     });
+    assert.notEqual(
+      retrieveRes.body[0].created_on,
+      retrieveRes.body[0].updated_on,
+      "updated_on has been changed"
+    );
   });
 
   test("Update an issue with missing _id: PUT request to `/api/issues/{project}`", async () => {

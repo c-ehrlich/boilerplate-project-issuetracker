@@ -35,7 +35,7 @@ module.exports = function (app) {
       if (
         !(req.body.issue_title && req.body.issue_text && req.body.created_by)
       ) {
-        res.status(400);
+        res.status(200);
         return res.json({ error: "required field(s) missing" });
       }
 
@@ -61,13 +61,13 @@ module.exports = function (app) {
     .put((req, res) => {
       // make sure an object ID is given
       if (!req.body._id) {
-        res.status(400);
+        res.status(200);
         return res.json({ error: "missing _id" });
       }
 
       // make sure we're actually updating something
       if (JSON.stringify(Object.keys(req.body)) === JSON.stringify(["_id"])) {
-        res.status(400);
+        res.status(200);
         return res.json({
           error: "no update field(s) sent",
           _id: req.body._id,

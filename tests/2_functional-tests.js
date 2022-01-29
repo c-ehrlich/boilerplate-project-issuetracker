@@ -82,7 +82,7 @@ suite("Functional Tests", function () {
       })
       .end((err, res) => {
         if (err) console.error(error);
-        assert.equal(res.status, 400);
+        assert.equal(res.status, 200);
         assert.equal(res.body.error, "required field(s) missing");
         done();
       });
@@ -342,7 +342,7 @@ suite("Functional Tests", function () {
       .send({
         issue_title: "updated-title",
       });
-    assert.equal(updateRes.status, 400, "updateRes status");
+    assert.equal(updateRes.status, 200, "updateRes status");
     assert.deepEqual(updateRes.body, {
       error: "missing _id",
     });
@@ -357,7 +357,7 @@ suite("Functional Tests", function () {
       .send({
         _id: "foo",
       });
-    assert.equal(updateRes.status, 400, "updateRes status");
+    assert.equal(updateRes.status, 200, "updateRes status");
     assert.deepEqual(updateRes.body, {
       error: "no update field(s) sent",
       _id: "foo",
@@ -456,7 +456,7 @@ suite("Functional Tests", function () {
   test("Delete an issue with missing _id: DELETE request to `/api/issues/{project}`", async () => {
     const deleteRes = await chai.request(server).delete("/api/issues/foo");
 
-    assert.equal(deleteRes.status, 400, "deleteRes status");
+    assert.equal(deleteRes.status, 200, "deleteRes status");
     assert.deepEqual(deleteRes.body, {
       error: "missing _id",
     });

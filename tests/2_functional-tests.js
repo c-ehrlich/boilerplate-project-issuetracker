@@ -380,7 +380,7 @@ suite("Functional Tests", function () {
     // Attempt to update Issue
     const updateRes = await chai
       .request(server)
-      .put(`/api/issues/foo`)
+      .put("/api/issues/foo")
       .type("form")
       .send({
         _id: "61f404887abd7a4988dae901",
@@ -395,14 +395,27 @@ suite("Functional Tests", function () {
   });
 
   // test("Delete an issue: DELETE request to `/api/issues/{project}`", (done) => {
+  //   // create an issue
+
+  //   // delete an issue
+
   //   assert.fail();
   // });
 
   // test("Delete an issue with an invalid _id: DELETE request to `/api/issues/{project}`", (done) => {
+  // attempt to delete an issue
   //   assert.fail();
   // });
 
-  // test("Delete an issue with missing _id: DELETE request to `/api/issues/{project}`", (done) => {
-  //   assert.fail();
-  // });
+  test("Delete an issue with missing _id: DELETE request to `/api/issues/{project}`", async () => {
+    const deleteRes = await chai
+      .request(server)
+      .delete("/api/issues/foo")
+      .type("form")
+
+    assert.equal(deleteRes.status, 400, "deleteRes status");
+    assert.deepEqual(deleteRes.body, {
+      error: "missing _id"
+    });
+  });
 });

@@ -90,7 +90,7 @@ module.exports = function (app) {
         ...(req.body.open && { open: req.body.open }),
       };
 
-      Issue.findByIdAndUpdate(req.body._id, updatePayload, (err, obj) => {
+      Issue.findOneAndUpdate({ _id: req.body._id, project: project }, updatePayload, (err, obj) => {
         if (!obj) {
           // this check needs to go before the `if (err)` check
           // because not getting an obj can happen both with and without err
@@ -114,7 +114,26 @@ module.exports = function (app) {
     .delete((req, res) => {
       const project = req.params.project;
 
-      // return {"result":"successfully deleted","_id":"5fce41fb83169401c9bb5186"}
-      // return ?? something... issue not found?
+      if (!req.body._id) {
+        res.status(400);
+        return res.json({ error: "missing _id" });
+      }
+
+      Issue.findOneAndDelete(
+        { _id: req.body._id, project: project },
+        (err, obj) => {
+          if (!obj) {
+            return res.json({ error: "invalid _id" });
+          }
+          if (err) {
+            console.error(err);
+            return res.json({ error: "failed to find or delete issue." });
+          }
+          return res.json({
+            result: "successfully deleted",
+            _id: obj._id,
+          });
+        }
+      );
     });
 };

@@ -95,13 +95,14 @@ module.exports = function (app) {
             // this check needs to go before the `if (err)` check
             // because not getting an obj can happen both with and without err
             return res.json({
-              error: "invalid _id",
+              error: "could not update",
+              _id: req.body._id,
             });
           }
 
           if (err) {
             console.error(err);
-            return res.json({ error: "failed to find or update issue." });
+            return res.json({ error: "could not update", _id: req.body._id });
           }
 
           return res.json({

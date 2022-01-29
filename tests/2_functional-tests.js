@@ -365,18 +365,21 @@ suite("Functional Tests", function () {
   });
 
   test("Update an issue with an invalid _id: PUT request to `/api/issues/{project}`", async () => {
+    const badID = "foo";
+
     // Attempt to update Issue
     const updateRes = await chai
       .request(server)
       .put("/api/issues/foo")
       .type("form")
       .send({
-        _id: "61f404887abd7a4988dae901",
+        _id: badID,
         issue_title: "bar",
       });
     assert.equal(updateRes.status, 200, "updateRes status");
     assert.deepEqual(updateRes.body, {
-      error: "invalid _id",
+      error: "could not update",
+      _id: badID,
     });
   });
 

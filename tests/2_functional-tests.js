@@ -388,16 +388,25 @@ suite("Functional Tests", function () {
   //   assert.fail();
   // });
 
-  // test("Delete an issue with an invalid _id: DELETE request to `/api/issues/{project}`", (done) => {
-  // attempt to delete an issue
-  //   assert.fail();
-  // });
-
-  test("Delete an issue with missing _id: DELETE request to `/api/issues/{project}`", async () => {
+  test("Delete an issue with an invalid _id: DELETE request to `/api/issues/{project}`", async () => {
     const deleteRes = await chai
       .request(server)
       .delete("/api/issues/foo")
       .type("form")
+      .send({
+        _id: "foo"
+      });
+
+    assert.equal(deleteRes.status, 200, "deleteRes status");
+    assert.deepEqual(deleteRes.body, {
+      error: "invalid _id"
+    });
+  });
+
+  test("Delete an issue with missing _id: DELETE request to `/api/issues/{project}`", async () => {
+    const deleteRes = await chai
+      .request(server)
+      .delete("/api/issues/foo");
 
     assert.equal(deleteRes.status, 400, "deleteRes status");
     assert.deepEqual(deleteRes.body, {

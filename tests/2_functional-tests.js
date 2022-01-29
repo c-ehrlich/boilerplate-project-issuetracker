@@ -436,17 +436,20 @@ suite("Functional Tests", function () {
   });
 
   test("Delete an issue with an invalid _id: DELETE request to `/api/issues/{project}`", async () => {
+    const badID = "foo";
+
     const deleteRes = await chai
       .request(server)
       .delete("/api/issues/foo")
       .type("form")
       .send({
-        _id: "foo",
+        _id: "badID",
       });
 
     assert.equal(deleteRes.status, 200, "deleteRes status");
     assert.deepEqual(deleteRes.body, {
-      error: "invalid _id",
+      error: "could not delete",
+      _id: "badID",
     });
   });
 

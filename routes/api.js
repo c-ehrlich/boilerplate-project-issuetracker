@@ -119,7 +119,6 @@ module.exports = function (app) {
       const project = req.params.project;
 
       if (!req.body._id) {
-        res.status(400);
         return res.json({ error: "missing _id" });
       }
 

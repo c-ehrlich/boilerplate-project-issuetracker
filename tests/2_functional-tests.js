@@ -380,13 +380,60 @@ suite("Functional Tests", function () {
     });
   });
 
-  // test("Delete an issue: DELETE request to `/api/issues/{project}`", (done) => {
-  //   // create an issue
+  test("Delete an issue: DELETE request to `/api/issues/{project}`", async () => {
+    const now = new Date().getTime();
 
-  //   // delete an issue
+    // Create Issue
+    const createRes = await chai
+      .request(server)
+      .post(`/api/issues/fcc-${now}`)
+      .type("form")
+      .send({
+        issue_title: "test-issue-title",
+        issue_text: "test-issue-text",
+        created_by: "test-created-by",
+        assigned_to: "test-assigned-to",
+        status_text: "test-status-text",
+      });
+    assert.equal(createRes.status, 200, "createRes status");
+    assert.include(createRes.body, {
+      issue_title: "test-issue-title",
+      issue_text: "test-issue-text",
+      created_by: "test-created-by",
+      assigned_to: "test-assigned-to",
+      status_text: "test-status-text",
+      open: true,
+    });
 
-  //   assert.fail();
-  // });
+    // Delete Issue
+    const _id = createRes.body._id;
+
+    const deleteRes = await chai
+      .request(server)
+      .delete(`/api/issues/fcc-${now}`)
+      .type("form")
+      .send({
+        _id: _id,
+      });
+
+    assert.equal(deleteRes.status, 200, "deleteRes status");
+    assert.deepEqual(deleteRes.body, {
+      result: "successfully deleted",
+      _id: _id,
+    });
+
+    // Search for the issue
+    const searchRes = await chai
+      .request(server)
+      .get(`/api/issues/fcc-${now}?_id=${_id}`);
+
+    assert.equal(searchRes.status, 200, "searchRes status");
+    assert.equal(
+      searchRes.body.length,
+      0,
+      "searchRes should return no documents"
+    );
+  });
 
   test("Delete an issue with an invalid _id: DELETE request to `/api/issues/{project}`", async () => {
     const deleteRes = await chai
@@ -394,23 +441,21 @@ suite("Functional Tests", function () {
       .delete("/api/issues/foo")
       .type("form")
       .send({
-        _id: "foo"
+        _id: "foo",
       });
 
     assert.equal(deleteRes.status, 200, "deleteRes status");
     assert.deepEqual(deleteRes.body, {
-      error: "invalid _id"
+      error: "invalid _id",
     });
   });
 
   test("Delete an issue with missing _id: DELETE request to `/api/issues/{project}`", async () => {
-    const deleteRes = await chai
-      .request(server)
-      .delete("/api/issues/foo");
+    const deleteRes = await chai.request(server).delete("/api/issues/foo");
 
     assert.equal(deleteRes.status, 400, "deleteRes status");
     assert.deepEqual(deleteRes.body, {
-      error: "missing _id"
+      error: "missing _id",
     });
   });
 });

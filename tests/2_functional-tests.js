@@ -110,8 +110,6 @@ suite("Functional Tests", function () {
     assert.equal(readRes.body[0].issue_title, "test-issue-title");
     assert.equal(readRes.body[0].issue_text, "test-issue-text");
     assert.equal(readRes.body[0].created_by, "test-created-by");
-
-    await Promise.resolve();
   });
 
   test("View issues on a project with one filter: GET request to `/api/issues/{project}`", async () => {
@@ -155,8 +153,6 @@ suite("Functional Tests", function () {
       0,
       "Checking that filtering for the wrong thing doesn't return anything"
     );
-
-    await Promise.resolve();
   });
 
   test("View issues on a project with multiple filters: GET request to `/api/issues/{project}`", async () => {
@@ -219,8 +215,6 @@ suite("Functional Tests", function () {
       0,
       "Checking that filtering for the wrong `open` doesn't return anything"
     );
-
-    await Promise.resolve();
   });
 
   test("Update one field on an issue: PUT request to `/api/issues/{project}`", async () => {
@@ -337,8 +331,6 @@ suite("Functional Tests", function () {
       status_text: "updated-status-text",
       open: false,
     });
-
-    await Promise.resolve();
   });
 
   test("Update an issue with missing _id: PUT request to `/api/issues/{project}`", async () => {
@@ -354,8 +346,6 @@ suite("Functional Tests", function () {
     assert.deepEqual(updateRes.body, {
       error: "missing _id",
     });
-
-    await Promise.resolve();
   });
 
   test("Update an issue with no fields to update: PUT request to `/api/issues/{project}`", async () => {
@@ -372,8 +362,6 @@ suite("Functional Tests", function () {
       error: "no update field(s) sent",
       _id: "foo",
     });
-
-    await Promise.resolve();
   });
 
   test("Update an issue with an invalid _id: PUT request to `/api/issues/{project}`", async () => {
@@ -390,8 +378,6 @@ suite("Functional Tests", function () {
     assert.deepEqual(updateRes.body, {
       error: "invalid _id",
     });
-
-    await Promise.resolve();
   });
 
   // test("Delete an issue: DELETE request to `/api/issues/{project}`", (done) => {
